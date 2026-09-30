@@ -56,27 +56,18 @@ function init() {
     
     console.log("Trying to load model...");
 
-const loader = new GLTFLoader();
+loader.load("assets/model.glb", (gltf) => {
 
-loader.load(
-    "assets/model.glb",
+    model = gltf.scene;
 
-    (gltf) => {
-        console.log("MODEL LOADED");
-        scene.add(gltf.scene);
-    },
+    model.scale.set(0.1, 0.1, 0.1);
 
-    (xhr) => {
-        console.log(
-            "Loading:",
-            (xhr.loaded / xhr.total * 100) + "%"
-        );
-    },
+    model.position.set(0, 0, -1);
 
-    (error) => {
-        console.error("MODEL ERROR:", error);
-    }
-);
+    scene.add(model);
+
+    console.log("MODEL LOADED");
+});
 
 
 

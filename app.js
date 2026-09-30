@@ -52,17 +52,24 @@ function init() {
 
     const loader = new GLTFLoader();
 
-    loader.load(
-        "assets/model.glb",
-        (gltf) => {
+loader.load(
+    "assets/model.glb",
+    (gltf) => {
 
-            model = gltf.scene;
+        console.log("MODEL LOADED");
 
-            model.visible = false;
+        model = gltf.scene;
 
-            scene.add(model);
-        }
-    );
+        scene.add(model);
+
+    },
+    undefined,
+    (error) => {
+
+        console.error("MODEL ERROR:", error);
+
+    }
+);
 
     renderer.setAnimationLoop(render);
 

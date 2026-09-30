@@ -50,26 +50,37 @@ function init() {
 
     scene.add(light);
 
-    const loader = new GLTFLoader();
+
+
+
+    
+    console.log("Trying to load model...");
+
+const loader = new GLTFLoader();
 
 loader.load(
     "assets/model.glb",
+
     (gltf) => {
-
         console.log("MODEL LOADED");
-
-        model = gltf.scene;
-
-        scene.add(model);
-
+        scene.add(gltf.scene);
     },
-    undefined,
+
+    (xhr) => {
+        console.log(
+            "Loading:",
+            (xhr.loaded / xhr.total * 100) + "%"
+        );
+    },
+
     (error) => {
-
         console.error("MODEL ERROR:", error);
-
     }
 );
+
+
+
+    
 
     renderer.setAnimationLoop(render);
 

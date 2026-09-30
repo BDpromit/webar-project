@@ -42,7 +42,7 @@ function init() {
         ARButton.createButton(renderer)
     );
 
-    // Lighting
+    // Lights
     const hemiLight = new THREE.HemisphereLight(
         0xffffff,
         0x444444,
@@ -64,33 +64,43 @@ function init() {
 
     const loader = new GLTFLoader();
 
+    console.log("Trying to load model...");
+
     loader.load(
         "assets/model.glb",
 
-        (gltf) => {
+        function (gltf) {
 
             console.log("MODEL LOADED");
 
             model = gltf.scene;
 
-            // Calculate model size
-            const box = new THREE.Box3().setFromObject(model);
-            const size = box.getSize(new THREE.Vector3());
-            const center = box.getCenter(new THREE.Vector3());
+            const box = new THREE.Box3()
+                .setFromObject(model);
+
+            const size = box.getSize(
+                new THREE.Vector3()
+            );
+
+            const center = box.getCenter(
+                new THREE.Vector3()
+            );
 
             console.log("MODEL SIZE:", size);
 
             // Center model
-            model.position.sub(center);
+            model.position.x -= center.x;
+            model.position.y -= center.y;
+            model.position.z -= center.z;
 
-            // Place in front of camera
-            model.position.z = -1;
+            // Put it in front of camera
+            model.position.z -= 2;
 
-            // Car seat visible scale
+            // Initial scale
             model.scale.set(
-                0.5,
-                0.5,
-                0.5
+                1,
+                1,
+                1
             );
 
             scene.add(model);
@@ -98,18 +108,31 @@ function init() {
             console.log("MODEL ADDED TO SCENE");
         },
 
-        (xhr) => {
+        function (xhr) {
+
             if (xhr.total > 0) {
+
                 console.log(
-                    "Loading: " +
-                    (xhr.loaded / xhr.total * 100).toFixed(1) +
+                    "Loading " +
+                    (
+                        xhr.loaded /
+                        xhr.total *
+                        100
+                    ).toFixed(1) +
                     "%"
                 );
+
             }
+
         },
 
-        (error) => {
-            console.error("MODEL ERROR:", error);
+        function (error) {
+
+            console.error(
+                "MODEL ERROR:",
+                error
+            );
+
         }
     );
 
@@ -138,7 +161,9 @@ function onWindowResize() {
 function render() {
 
     if (model) {
-        model.rotation.y += 0.002;
+
+        model.rotation.y += 0.005;
+
     }
 
     renderer.render(

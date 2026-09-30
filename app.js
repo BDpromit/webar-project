@@ -3,7 +3,9 @@ import * as THREE from "three";
 import { ARButton } from "https://unpkg.com/three@0.160.0/examples/jsm/webxr/ARButton.js";
 
 import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+
 console.log("APP LOADED");
+
 let camera;
 let scene;
 let renderer;
@@ -19,7 +21,7 @@ function init() {
         70,
         window.innerWidth / window.innerHeight,
         0.01,
-        20
+        100
     );
 
     renderer = new THREE.WebGLRenderer({
@@ -37,48 +39,86 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     document.body.appendChild(
-        ARButton.createButton(renderer, {
-            requiredFeatures: ["hit-test"]
-        })
+        ARButton.createButton(renderer)
     );
 
-    const light = new THREE.HemisphereLight(
+    // Lighting
+    const hemiLight = new THREE.HemisphereLight(
         0xffffff,
-        0xbbbbff,
+        0x444444,
+        3
+    );
+
+    scene.add(hemiLight);
+
+    const dirLight = new THREE.DirectionalLight(
+        0xffffff,
         2
     );
 
-    scene.add(light);
+    dirLight.position.set(5, 10, 7);
 
+    scene.add(dirLight);
 
+    console.log("Creating GLTF loader");
 
+    const loader = new GLTFLoader();
 
-    
-    console.log("Trying to load model...");
+    loader.load(
+        "assets/model.glb",
 
-loader.load("assets/model.glb", (gltf) => {
+        (gltf) => {
 
-    model = gltf.scene;
+            console.log("MODEL LOADED");
 
-    model.scale.set(0.1, 0.1, 0.1);
+            model = gltf.scene;
 
-    model.position.set(0, 0, -1);
+            // Calculate model size
+            const box = new THREE.Box3().setFromObject(model);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
 
-    scene.add(model);
+            console.log("MODEL SIZE:", size);
 
-    console.log("MODEL LOADED");
-});
+            // Center model
+            model.position.sub(center);
 
+            // Place in front of camera
+            model.position.z = -1;
 
+            // Car seat visible scale
+            model.scale.set(
+                0.5,
+                0.5,
+                0.5
+            );
 
-    
+            scene.add(model);
 
-    renderer.setAnimationLoop(render);
+            console.log("MODEL ADDED TO SCENE");
+        },
+
+        (xhr) => {
+            if (xhr.total > 0) {
+                console.log(
+                    "Loading: " +
+                    (xhr.loaded / xhr.total * 100).toFixed(1) +
+                    "%"
+                );
+            }
+        },
+
+        (error) => {
+            console.error("MODEL ERROR:", error);
+        }
+    );
 
     window.addEventListener(
         "resize",
         onWindowResize
     );
+
+    renderer.setAnimationLoop(render);
 }
 
 function onWindowResize() {
@@ -97,21 +137,8 @@ function onWindowResize() {
 
 function render() {
 
-    if (model && !model.visible) {
-
-        model.visible = true;
-
-        model.position.set(
-            0,
-            0,
-            -1
-        );
-
-        model.scale.set(
-            0.25,
-            0.25,
-            0.25
-        );
+    if (model) {
+        model.rotation.y += 0.002;
     }
 
     renderer.render(

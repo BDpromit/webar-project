@@ -67,74 +67,78 @@ function init() {
     console.log("Trying to load model...");
 
     loader.load(
-        "assets/model.glb",
+    "assets/model.glb",
 
-        function (gltf) {
+    function (gltf) {
 
-            console.log("MODEL LOADED");
+        console.log("MODEL LOADED");
 
-            model = gltf.scene;
+        model = gltf.scene;
 
-            const box = new THREE.Box3()
-                .setFromObject(model);
+        const box = new THREE.Box3()
+            .setFromObject(model);
 
-            const size = box.getSize(
-                new THREE.Vector3()
-            );
+        const size = box.getSize(
+            new THREE.Vector3()
+        );
 
-            const center = box.getCenter(
-                new THREE.Vector3()
-            );
+        const center = box.getCenter(
+            new THREE.Vector3()
+        );
 
-            console.log("MODEL SIZE:", size);
+        console.log("MODEL SIZE:", size);
 
-            // Center model
-            model.position.x -= center.x;
-            model.position.y -= center.y;
-            model.position.z -= center.z;
+        // Center the model
+        model.position.x -= center.x;
+        model.position.y -= center.y;
+        model.position.z -= center.z;
 
-            // Put it in front of camera
-            model.position.z -= 2;
+        // Scale down (your model is huge)
+        model.scale.set(
+            0.01,
+            0.01,
+            0.01
+        );
 
-            // Initial scale
-            model.scale.set(
-                1,
-                1,
-                1
-            );
+        // Put in front of camera
+        model.position.set(
+            0,
+            -0.5,
+            -1.5
+        );
 
-            scene.add(model);
+        scene.add(model);
 
-            console.log("MODEL ADDED TO SCENE");
-        },
+        console.log("MODEL ADDED TO SCENE");
+    },
 
-        function (xhr) {
+    function (xhr) {
 
-            if (xhr.total > 0) {
+        if (xhr.total > 0) {
 
-                console.log(
-                    "Loading " +
-                    (
-                        xhr.loaded /
-                        xhr.total *
-                        100
-                    ).toFixed(1) +
-                    "%"
-                );
-
-            }
-
-        },
-
-        function (error) {
-
-            console.error(
-                "MODEL ERROR:",
-                error
+            console.log(
+                "Loading " +
+                (
+                    xhr.loaded /
+                    xhr.total *
+                    100
+                ).toFixed(1) +
+                "%"
             );
 
         }
-    );
+
+    },
+
+    function (error) {
+
+        console.error(
+            "MODEL ERROR:",
+            error
+        );
+
+    }
+);
 
     window.addEventListener(
         "resize",
